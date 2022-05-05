@@ -17,11 +17,11 @@ largura = 650
 altura = 500
 tela = pygame.display.set_mode((largura, altura))
 
-#posiçao dos objetos
-x_cobra = 300
-y_cobra = 220
-x_fruta = randint(20, 600)
-y_fruta = randint(40, 450)
+#posiçao inicial dos objetos
+x_player = 300
+y_player = 220
+x_vermelho= randint(20, 600)
+y_vermelho = randint(40, 450)
 x_azul = randint(0, 640)
 y_azul = randint(0, 480)
 x_rosa = randint(0, 640)
@@ -32,50 +32,87 @@ x_controle = velocidade
 y_controle = 0
 
 #contagem de pontos
-pontos = azuis = rosas = vermelhos = 0
+azuis = rosas = vermelhos = 0
 fonte = pygame.font.SysFont('arial', 30, bold=True, italic=True)
 
 #alterando o nome do jogo
-pygame.display.set_caption('Snake')
+pygame.display.set_caption('Jogo')
 
 #controlando velocidade do jogo
 relogio = pygame.time.Clock()
 
-lista_cobra = []
-comprimento = 5
+class Player:
+  def __init__(self, cor, pos_x, pos_y):
+    self._cor = cor
+    self._pos_x = pos_x
+    self._pos_y = pos_y
 
 
+class Coletaveis:
+  def __init__(self, cor, pos_x, pos_y, efeito):
+    self._cor = cor
+    self._pos_x = pos_x
+    self._pos_y = pos_y
+    self._efeito = efeito
+
+  def aumentar_velocidade(self):
+    global velocidade
+    velocidade += 10
+
+  def diminuir_velocidade(self):
+    global velocidade
+    velocidade -= 10
+
+  def invencivel(self):
+    global imortal
+    imortal = True
+
+    player._cor = (255, 0, 255)
 
 def reiniciar_jogo():
-  global x_cobra, x_fruta, y_cobra, y_fruta, vivo, azuis, vermelhos, rosas, x_azul, x_rosa, y_azul, y_rosa
+  global x_player, y_player, x_vermelho, y_vermelho, vivo, azuis, vermelhos, rosas, x_azul, x_rosa, y_azul, y_rosa
   azuis = vermelhos = rosas =0
-  x_cobra = 300
-  y_cobra = 220
-  x_fruta = randint(0, 600)
-  y_fruta = randint(0, 440)
-  x_azul = randint(0, 600)
-  y_azul = randint(0, 440)
-  x_rosa = randint(0,600)
-  y_rosa = randint(0,440)
+  x_player = 300
+  y_player = 220
   vivo = True
 
+class Bordas:
+  def __init__(self, pos_x, pos_y, cor):
+    self._pos_x = pos_x
+    self._pos_y = pos_y
+    self._cor = cor
+
 def colisao():
-  global y_azul, x_fruta, y_fruta, x_azul, pontos, x_rosa, y_rosa, vermelhos, rosas, azuis
-  if cobra.colliderect(fruta):
-    x_fruta = randint(0, 600)
-    y_fruta = randint(0, 440)
+  global y_azul, x_vermelho, y_vermelho, x_azul, pontos, x_rosa, y_rosa, vermelhos, rosas, azuis
+  if player.colliderect(vermelho):
+    x_vermelho = randint(0, 600)
+    y_vermelho = randint(0, 440)
     som_colisao.play()
     vermelhos += 1
-  if cobra.colliderect(rosa):
+  if player.colliderect(rosa):
     x_rosa = randint(0, 600)
     y_rosa = randint(0, 440)
     som_colisao.play()
     rosas += 1
-  if cobra.colliderect(azul):
+  if player.colliderect(azul):
     x_azul = randint(0, 600)
     y_azul = randint(0, 440)
     som_colisao.play()
     azuis += 1
+menu = True
+while menu:
+  for event in pygame.event.get():
+    if event.type == QUIT:
+      exit()
+    if event.type == KEYDOWN:
+      if event.key == K_r:
+        menu = False
+        reiniciar_jogo()
+  tela.fill((255, 255, 255))
+  menu_texto = ('Pressione "R" para iniciar')
+  texto_formatado = fonte.render(menu_texto, True, (0, 0, 0))
+  tela.blit(texto_formatado, (80, altura//2))
+  pygame.display.update()
 
 vivo = True
 while True:
@@ -89,10 +126,10 @@ while True:
   bordaesq = pygame.draw.line(tela, (0, 0, 0), (6, 5), (6, 475), 5)
   bordadir = pygame.draw.line(tela, (0, 0, 0), (635, 0), (635, 475), 5)
   bordainf = pygame.draw.line(tela, (0, 0, 0), (6, 475), (635, 475), 5)
-  cobra = pygame.draw.rect(tela, (0, 255, 0), (x_cobra, y_cobra, 20, 20))
-  fruta = pygame.draw.rect(tela, (255, 0, 0), (x_fruta, y_fruta, 10, 10))
+  player = pygame.draw.rect(tela, (0, 255, 0), (x_player, y_player, 20, 20))
+  vermelho = pygame.draw.rect(tela, (255, 0, 0), (x_vermelho, y_vermelho, 10, 10))
   azul = pygame.draw.rect(tela, (0,0,255),(x_azul, y_azul, 10, 10))
-  rosa = pygame.draw.rect(tela, (255, 0, 255), (rosa,rosa,10,10))
+  rosa = pygame.draw.rect(tela, (255, 0, 255), (x_rosa,y_rosa,10,10))
 
   for event in pygame.event.get():
     if event.type == QUIT:
@@ -112,29 +149,32 @@ while True:
         x_controle = 0
         y_controle = velocidade
 
-  x_cobra += x_controle
-  y_cobra += y_controle
+  x_player += x_controle
+  y_player += y_controle
 
-  if cobra.colliderect(fruta) or cobra.colliderect(azul) or cobra.colliderect(rosa):
+  if player.colliderect(vermelho) or player.colliderect(azul) or player.colliderect(rosa):
     colisao()
 
     pygame.display.update()
-  if cobra.colliderect(bordadir) or cobra.colliderect(bordasup) or cobra.colliderect(bordaesq) or cobra.colliderect(bordainf):
+  if player.colliderect(bordadir) or player.colliderect(bordasup) or player.colliderect(bordaesq) or player.colliderect(bordainf):
+
     fonte2 = pygame.font.SysFont('arial', 20, True, True)
     recado = 'Game Over! Pressione R para jogar novamente'
     texto_formatado2 = fonte2.render(recado, True, (0, 0, 0))
     vivo = False
     while not vivo:
-
       tela.fill((255, 255, 255))
-      tela.blit(texto_formatado2, (largura // 2, altura // 2))
+      fonte2 = pygame.font.SysFont('arial', 20, True, True)
+      recado = 'Game Over! Pressione R para jogar novamente'
+      texto_formatado = fonte2.render(recado, True, (0, 0, 0))
       for event in pygame.event.get():
         if event.type == QUIT:
           exit()
         if event.type == KEYDOWN:
           if event.key == K_r:
             reiniciar_jogo()
-      tela.blit(texto_formatado2, (largura//2,altura//2))
+      tela.blit(texto_formatado, (80, altura // 2))
+      pygame.display.update()
   tela.blit(texto_formatado, (20,40))
 
-  pygame.display.update()
+  pygame.display.u
