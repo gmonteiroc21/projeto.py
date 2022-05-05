@@ -1,0 +1,136 @@
+import pygame
+
+from pygame.locals import *
+from sys import exit
+from random import randint
+
+pygame.init()
+
+#sons do jogo
+pygame.mixer.music.set_volume(0.3)
+musica_tema = pygame.mixer.music.load('BoxCat Games - Map Theme.mp3')
+pygame.mixer.music.play(-1)
+som_colisao = pygame.mixer.Sound('smw_coin.wav')
+
+#criando tela
+largura = 650
+altura = 500
+tela = pygame.display.set_mode((largura, altura))
+pygame.display.set_caption('Jogo')
+
+relogio = pygame.time.Clock()
+fonte = pygame.font.SysFont('arial', 30, bold=True, italic=True)
+fonte2 = pygame.font.SysFont('arial', 16, bold=True, italic=True)
+
+class Player:
+  def __init__(self, cor, pos_x, pos_y):
+    self._cor = cor
+    self._pos_x = pos_x
+    self._pos_y = pos_y
+
+  def desenhar(self):
+      global player_na_tela
+      pygame.draw.rect(tela, self._cor, (self._pos_x, self._pos_y, 20, 20))
+      player_na_tela = True
+class Coletaveis:
+  def __init__(self, cor, pos_x, pos_y, efeito):
+    self._cor = cor
+    self._pos_x = pos_x
+    self._pos_y = pos_y
+    self._efeito = efeito
+
+  def desenhar(self):
+      pygame.draw.rect(tela, (self._cor), (self._pos_x, self._pos_y, 10, 10))
+  def aumentar_velocidade(self):
+    global velocidade
+    velocidade += 10
+
+  def diminuir_velocidade(self):
+    global velocidade
+    velocidade -= 10
+
+  def invencivel(self):
+    global imortal
+    global player
+    imortal = True
+    player._cor = (255, 0, 255)
+
+
+def reiniciar_jogo():
+    global menu
+    menu = True
+
+def colisoes():
+    global player, ciano, vermelho, marrom, pontos, vermelhos, marrons, cianos, velocidade, imortal
+    if player.colliderect(vermelho):
+        som_colisao.play()
+        vermelhos += 1
+        vermelho = Coletaveis((255, 0, 0), (randint(0, largura - 30)), (randint(0, altura - 30)), 'aumentar_velocidade')
+        velocidade += 10
+    if player.colliderect(ciano):
+        ciano = Coletaveis((255, 255, 0), (randint(0, largura - 30)), (randint(0, altura - 30)), 'invencibilidade')
+        som_colisao.play()
+        cianos += 1
+        imortal = True
+    if player.colliderect(marrom):
+        marrom = Coletaveis((150, 75, 0), (randint(0, largura - 30)), (randint(0, altura - 30)), 'diminuir velocidade')
+        som_colisao.play()
+        marrons += 1
+menu = True
+player_na_tela = False
+cor = False
+while menu:
+    tela.fill((255, 255, 255))
+    menu_texto = ('Selecione uma cor para jogar:')
+    opcoes = ('''"G" -> Verde
+              "B" -> Azul
+              "P" -> Rosa
+              "Y" -> Amarelo ''')
+    if not cor:
+        texto_formatado = fonte.render(menu_texto, True, (0, 0, 0))
+        texto_formatado2 = fonte2.render(opcoes, True, (0,0,0))
+        tela.blit(texto_formatado, (80, 20))
+        tela.blit(texto_formatado2, (0, altura/2))
+    else:
+        inicio = ('Pressione "R" para iniciar')
+        texto_formatado3 = fonte.render(inicio, True, (0,0,0))
+        tela.blit(texto_formatado3, (100, altura/2))
+        pygame.display.update()
+    for event in pygame.event.get():
+        if event.type == QUIT:
+          exit()
+        if event.type == KEYDOWN:
+          if cor and event.key == K_r :
+              menu = False
+          if event.key == K_g:
+              cor_selecionada = (0, 255, 0)
+              cor = True
+              menu_texto = ('Pressione "R" para iniciar')
+          if event.key == K_b:
+              cor_selecionada = (0, 0, 255)
+              cor = True
+              menu_texto = ('Pressione "R" para iniciar')
+          if event.key == K_p:
+              cor_selecionada = (255, 0, 127)
+              cor = True
+              menu_texto = ('Pressione "R" para iniciar')
+          if event.key == K_y:
+              cor_selecionada = (255, 255, 0)
+              cor = True
+              menu_texto = ('Pressione "R" para iniciar')
+          pygame.display.update()
+    pygame.display.update()
+while True:
+    relogio.tick(30)
+    tela.fill((122, 122, 122))
+
+    player = Player(cor_selecionada, largura/2, altura/2)
+    vermelho = Coletaveis((255,0,0),(randint(0, largura-30)), (randint(0,altura-30)), 'aumentar_velocidade')
+    ciano = Coletaveis((0, 255, 255), (randint(0, largura - 30)), (randint(0, altura - 30)), 'invencibilidade')
+    marrom = Coletaveis((150, 75, 0), (randint(0, largura - 30)), (randint(0, altura - 30)),'diminuir velocidade')
+    for event in pygame.event.get():
+        if event.type == QUIT:
+          exit()
+        if not player_na_tela:
+            player.desenhar()
+    pygame.display.update()
