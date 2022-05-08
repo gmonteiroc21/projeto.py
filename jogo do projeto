@@ -1,5 +1,4 @@
 import pygame
-
 from pygame.locals import *
 from sys import exit
 from random import randint
@@ -18,79 +17,79 @@ altura = 500
 tela = pygame.display.set_mode((largura, altura))
 pygame.display.set_caption('Jogo')
 
+inicio = True
+velocidade = 10
+
 relogio = pygame.time.Clock()
 fonte = pygame.font.SysFont('arial', 30, bold=True, italic=True)
 fonte2 = pygame.font.SysFont('arial', 16, bold=True, italic=True)
 
 class Player:
   def __init__(self, cor, pos_x, pos_y):
-    self._cor = cor
-    self._pos_x = pos_x
-    self._pos_y = pos_y
+    self.cor = cor
+    self.pos_x = pos_x
+    self.pos_y = pos_y
 
   def desenhar(self):
       global player_na_tela
-      pygame.draw.rect(tela, self._cor, (self._pos_x, self._pos_y, 20, 20))
+      pygame.draw.rect(tela, self.cor, (self.pos_x, self.pos_y, 20, 20))
       player_na_tela = True
+
+  def andar(self):
+      if event.key == K_LEFT:
+          self.pos_x -= 20
+      if event.key == K_RIGHT:
+          self.pos_x += 20
+      if event.key == K_UP:
+          self.pos_y -= 20
+      if event.key == K_DOWN:
+          self.pos_y += 20
+
+      def colisoes(coletavel):
+          global player, ciano, vermelho, marrom, pontos, vermelhos, marrons, cianos, velocidade, imortal
+          if player.pos_x <= (coletavel.pos_x + 10) and player.pos_x > coletavel.pos_x:
+              coletavel.reaperecer()
+
 class Coletaveis:
+  global coletavel
   def __init__(self, cor, pos_x, pos_y, efeito):
-    self._cor = cor
-    self._pos_x = pos_x
-    self._pos_y = pos_y
-    self._efeito = efeito
+    self.cor = cor
+    self.pos_x = pos_x
+    self.pos_y = pos_y
+    self.efeito = efeito
 
   def desenhar(self):
-      pygame.draw.rect(tela, (self._cor), (self._pos_x, self._pos_y, 10, 10))
-  def aumentar_velocidade(self):
-    global velocidade
-    velocidade += 10
+      pygame.draw.rect(tela, (self.cor), (self.pos_x, self.pos_y, 10, 10))
 
-  def diminuir_velocidade(self):
-    global velocidade
-    velocidade -= 10
-
-  def invencivel(self):
-    global imortal
-    global player
-    imortal = True
-    player._cor = (255, 0, 255)
-
+  #def reaperecer(self):
+   #   if coletavel == vermelho:
 
 def reiniciar_jogo():
     global menu
     menu = True
 
-def colisoes():
-    global player, ciano, vermelho, marrom, pontos, vermelhos, marrons, cianos, velocidade, imortal
-    if player.colliderect(vermelho):
-        som_colisao.play()
-        vermelhos += 1
-        vermelho = Coletaveis((255, 0, 0), (randint(0, largura - 30)), (randint(0, altura - 30)), 'aumentar_velocidade')
-        velocidade += 10
-    if player.colliderect(ciano):
-        ciano = Coletaveis((255, 255, 0), (randint(0, largura - 30)), (randint(0, altura - 30)), 'invencibilidade')
-        som_colisao.play()
-        cianos += 1
-        imortal = True
-    if player.colliderect(marrom):
-        marrom = Coletaveis((150, 75, 0), (randint(0, largura - 30)), (randint(0, altura - 30)), 'diminuir velocidade')
-        som_colisao.play()
-        marrons += 1
 menu = True
 player_na_tela = False
 cor = False
 while menu:
     tela.fill((255, 255, 255))
     menu_texto = ('Selecione uma cor para jogar:')
-    opcoes = ('''"G" -> Verde
-              "B" -> Azul
-              "P" -> Rosa
-              "Y" -> Amarelo ''')
+    opcaoG = '"G" -> Verde'
+    opcaoB = '"B" -> Azul'
+    opcaoP = '"P" -> Rosa'
+    opcaoY= '"Y" -> Amarelo'
+
     if not cor:
         texto_formatado = fonte.render(menu_texto, True, (0, 0, 0))
-        texto_formatado2 = fonte2.render(opcoes, True, (0,0,0))
+        texto_formatado2 = fonte2.render(opcaoG, True, (0,0,0))
+        texto_formatado3 = fonte2.render(opcaoB, True, (0,0,0))
+        texto_formatado4 = fonte2.render(opcaoP, True, (0,0,0))
+        texto_formatado5 = fonte2.render(opcaoY, True, (0,0,0))
         tela.blit(texto_formatado, (80, 20))
-        tela.blit(texto_formatado2, (0, altura/2))
+        tela.blit(texto_formatado2, (0, 375))
+        tela.blit(texto_formatado3, (0, 150))
+        tela.blit(texto_formatado4, (0, 225))
+        tela.blit(texto_formatado5, (0, 300))
     else:
         inicio = ('Pressione "R" para iniciar')
         texto_formatado3 = fonte.render(inicio, True, (0,0,0))
@@ -118,19 +117,21 @@ while menu:
               cor_selecionada = (255, 255, 0)
               cor = True
               menu_texto = ('Pressione "R" para iniciar')
-          pygame.display.update()
     pygame.display.update()
+player = Player(cor_selecionada, largura/2, altura/2)
+vermelho = Coletaveis((255,0,0),(randint(0, largura-30)), (randint(0,altura-30)), 'aumentar_velocidade')
+ciano = Coletaveis((0, 255, 255), (randint(0, largura - 30)), (randint(0, altura - 30)), 'invencibilidade')
+marrom = Coletaveis((150, 75, 0), (randint(0, largura - 30)), (randint(0, altura - 30)),'diminuir velocidade')
 while True:
     relogio.tick(30)
     tela.fill((122, 122, 122))
-
-    player = Player(cor_selecionada, largura/2, altura/2)
-    vermelho = Coletaveis((255,0,0),(randint(0, largura-30)), (randint(0,altura-30)), 'aumentar_velocidade')
-    ciano = Coletaveis((0, 255, 255), (randint(0, largura - 30)), (randint(0, altura - 30)), 'invencibilidade')
-    marrom = Coletaveis((150, 75, 0), (randint(0, largura - 30)), (randint(0, altura - 30)),'diminuir velocidade')
+    player.desenhar()
+    vermelho.desenhar()
+    ciano.desenhar()
+    marrom.desenhar()
     for event in pygame.event.get():
         if event.type == QUIT:
           exit()
-        if not player_na_tela:
-            player.desenhar()
+        if event.type == KEYDOWN:
+            player.andar()
     pygame.display.update()
