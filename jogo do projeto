@@ -92,8 +92,8 @@ while menu:
         tela.blit(texto_formatado5, (0, 300))
     else:
         inicio = ('Pressione "R" para iniciar')
-        texto_formatado3 = fonte.render(inicio, True, (0,0,0))
-        tela.blit(texto_formatado3, (100, altura/2))
+        texto_formatado6 = fonte.render(inicio, True, (0,0,0))
+        tela.blit(texto_formatado6, (100, altura/2))
         pygame.display.update()
     for event in pygame.event.get():
         if event.type == QUIT:
