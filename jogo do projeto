@@ -11,9 +11,11 @@ altura = 500
 tela = pygame.display.set_mode((largura, altura))
 pygame.display.set_caption('Jogo')
 
+vermelhos = cianos = marrons = 0
 
 inicio = True
-x_controle = velocidade = 10
+velocidade = 5
+x_controle = velocidade
 y_controle = 0
 lista = []
 
@@ -31,21 +33,40 @@ class Player:
       pygame.draw.rect(tela, self.cor, (self.pos_x, self.pos_y, 20, 20))
 
   def andar(self):
-
-      if pygame.key.get_pressed()[K_LEFT]:
-          player.pos_x -= 20
-      if pygame.key.get_pressed()[K_RIGHT]:
-          player.pos_x += 20
-      if pygame.key.get_pressed()[K_UP]:
-          player.pos_y -= 20
-      if pygame.key.get_pressed()[K_DOWN]:
-          player.pos_y += 20
+    global x_controle, y_controle
+    if event.key == K_LEFT:
+      x_controle = -velocidade
+      y_controle = 0
+    if event.key == K_RIGHT:
+      x_controle = velocidade
+      y_controle = 0
+    if event.key == K_UP:
+      x_controle = 0
+      y_controle = -velocidade
+    if event.key == K_DOWN:
+      x_controle = 0
+      y_controle = velocidade
 
   def colidiu(self, coletavel):
-      global Coletaveis
-      if coletavel.pos_x -20 < player.pos_x and player.pos_x < coletavel.pos_x + 20:
-          if coletavel.pos_y - 20 < player.pos_y and player. pos_y < coletavel.pos_y + 20:
-              coletavel.cor = (0,0,0)
+      global Coletaveis, vermelhos, cianos, marrons, velocidade
+      if coletavel.pos_x -20 < player.pos_x and player.pos_x < coletavel.pos_x + 10:
+          if coletavel.pos_y - 20 < player.pos_y and player. pos_y < coletavel.pos_y + 10:
+              coletavel.pos_x = randint(0, largura - 30)
+              coletavel.pos_y = randint(0, altura - 30)
+              coletavel.desenhar_coletavel()
+              if coletavel == vermelho:
+                vermelhos += 1
+
+              if coletavel == ciano:
+                cianos += 1
+              if coletavel == marrom:
+                marrons += 1
+                if velocidade > 10:
+                  velocidade -= 10
+                else:
+                  velocidade -= 2
+                if velocidade <= 0:
+
 
 class Coletaveis:
 
@@ -121,12 +142,21 @@ lista.append(ciano)
 lista.append(vermelho)
 lista.append(marrom)
 while True:
+
     relogio.tick(30)
-    tela.fill((122, 122, 122))
+    tela.fill((255, 255, 255))
+
     player.desenhar()
     vermelho.desenhar_coletavel()
     ciano.desenhar_coletavel()
     marrom.desenhar_coletavel()
+    bordasup = pygame.draw.line(tela, (0, 0, 0), (6, 5), (635, 5), 5)
+    bordaesq = pygame.draw.line(tela, (0, 0, 0), (6, 5), (6, 475), 5)
+    bordadir = pygame.draw.line(tela, (0, 0, 0), (635, 0), (635, 475), 5)
+    bordainf = pygame.draw.line(tela, (0, 0, 0), (6, 475), (635, 475), 5)
+    mensagem = (f'cianos: {cianos}, marrons:{marrons}, vermelhos:{vermelhos}')
+    texto_formatado = fonte.render(mensagem, True, (0, 0, 0))
+
     for event in pygame.event.get():
         if event.type == QUIT:
           exit()
@@ -134,5 +164,10 @@ while True:
             player.andar()
         for coletavel in lista:
             player.colidiu(coletavel)
-            print(coletavel.pos_x, coletavel.pos_y, player.pos_x, player.pos_y)
+
+    player.pos_x += x_controle
+    player.pos_y += y_controle
+
+    tela.blit(texto_formatado, (20, 40))
+
     pygame.display.update()
