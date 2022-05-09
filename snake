@@ -41,33 +41,6 @@ pygame.display.set_caption('Jogo')
 #controlando velocidade do jogo
 relogio = pygame.time.Clock()
 
-class Player:
-  def __init__(self, cor, pos_x, pos_y):
-    self._cor = cor
-    self._pos_x = pos_x
-    self._pos_y = pos_y
-
-
-class Coletaveis:
-  def __init__(self, cor, pos_x, pos_y, efeito):
-    self._cor = cor
-    self._pos_x = pos_x
-    self._pos_y = pos_y
-    self._efeito = efeito
-
-  def aumentar_velocidade(self):
-    global velocidade
-    velocidade += 10
-
-  def diminuir_velocidade(self):
-    global velocidade
-    velocidade -= 10
-
-  def invencivel(self):
-    global imortal
-    imortal = True
-
-    player._cor = (255, 0, 255)
 
 def reiniciar_jogo():
   global x_player, y_player, x_vermelho, y_vermelho, vivo, azuis, vermelhos, rosas, x_azul, x_rosa, y_azul, y_rosa
@@ -75,12 +48,6 @@ def reiniciar_jogo():
   x_player = 300
   y_player = 220
   vivo = True
-
-class Bordas:
-  def __init__(self, pos_x, pos_y, cor):
-    self._pos_x = pos_x
-    self._pos_y = pos_y
-    self._cor = cor
 
 def colisao():
   global y_azul, x_vermelho, y_vermelho, x_azul, pontos, x_rosa, y_rosa, vermelhos, rosas, azuis
@@ -99,6 +66,7 @@ def colisao():
     y_azul = randint(0, 440)
     som_colisao.play()
     azuis += 1
+      
 menu = True
 while menu:
   for event in pygame.event.get():
@@ -177,4 +145,4 @@ while True:
       pygame.display.update()
   tela.blit(texto_formatado, (20,40))
 
-  pygame.display.u
+  pygame.display.update()
