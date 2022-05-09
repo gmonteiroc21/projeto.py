@@ -5,12 +5,6 @@ from random import randint
 
 pygame.init()
 
-#sons do jogo
-pygame.mixer.music.set_volume(0.3)
-musica_tema = pygame.mixer.music.load('BoxCat Games - Map Theme.mp3')
-pygame.mixer.music.play(-1)
-som_colisao = pygame.mixer.Sound('smw_coin.wav')
-
 #criando tela
 largura = 650
 altura = 500
