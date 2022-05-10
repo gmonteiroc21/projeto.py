@@ -112,9 +112,9 @@ while menu:
     pygame.display.update()
 
 player = Player((0,0,255), largura//2, altura//2 )
-vermelho = Coletaveis((255, 0, 0), (randint(0, largura - 30)), (randint(50, altura - 30)))
-ciano = Coletaveis((0, 255, 255), (randint(0, largura - 30)), (randint(50, altura - 30)))
-marrom = Coletaveis((150, 75, 0), (randint(0, largura - 30)), (randint(50, altura - 30)))
+vermelho = Coletaveis((255, 0, 0), (randint(0, largura - 30)//10*10), (randint(50, altura - 30)//10*10))
+ciano = Coletaveis((0, 255, 255), (randint(0, largura - 30)//10*10), (randint(50, altura - 30)//10*10))
+marrom = Coletaveis((150, 75, 0), (randint(0, largura - 30)//10*10), (randint(50, altura - 30)//10*10))
 lista.append(ciano)
 lista.append(vermelho)
 lista.append(marrom)
