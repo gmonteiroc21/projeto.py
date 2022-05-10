@@ -10,90 +10,84 @@ largura = 600
 altura = 600
 tela = pygame.display.set_mode((largura, altura))
 pygame.display.set_caption('Jogo')
-background = pygame.image.load('tumblr_5310eb96570ee4e51acae3ae0f57fd2e_cac009e7_540.png')
-redimensionado = pygame.transform.scale(background, (600, 600))
 
 # variaveis iniciais
 cianos = vermelhos = marrons = 0
-inicio = True
+vivo = True
 velocidade = 10
+velocidade_vilao = 15
 x_controle = 0
 y_controle = 0
 lista = []
 
 relogio = pygame.time.Clock()
-fonte = pygame.font.SysFont('arial', 30, bold=True, italic=True)
+fonte = pygame.font.SysFont('arial', 25, bold=True, italic=True)
 fonte2 = pygame.font.SysFont('arial', 16, bold=True, italic=True)
-fonte_placar = pygame.font.SysFont('arial', 15, True, True)  # Alterado ta
+fonte_placar = pygame.font.SysFont('arial', 15, True, True)
 
 
-class Mario(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.sprites = []
-        self.imagem_baixo = pygame.image.load('mario_baixo.jpg')
-        self.imagem_cima = pygame.image.load('mario_cima.jpg')
-        self.imagem_direita = pygame.image.load('mario_direita.jpg')
-        self.imagem_esquerda = pygame.image.load('mario_esquerda.jpg')
-
-        self.atual = 0
-        self.image = self.imagem_baixo
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (300, 300)
+class Player:
+    def __init__(self, cor, pos_x, pos_y):
+        self.cor = cor
+        self.pos_x = pos_x
+        self.pos_y = pos_y
 
     def andar(self):
         global x_controle, y_controle
         if event.key == K_LEFT:
-            x_controle += -velocidade
-            y_controle += 0
-            player.image = player.imagem_esquerda
+            x_controle = -velocidade
+            y_controle = 0
         if event.key == K_RIGHT:
-            x_controle += velocidade
-            y_controle += 0
-            player.image = player.imagem_direita
+            x_controle = velocidade
+            y_controle = 0
         if event.key == K_UP:
-            x_controle += 0
-            y_controle += -velocidade
-            player.image = player.imagem_cima
+            x_controle = 0
+            y_controle = -velocidade
         if event.key == K_DOWN:
-            x_controle += 0
-            y_controle += velocidade
-            player.image = player.imagem_baixo
-    # def colidiu(self, coletavel):
-    # global Coletaveis, cianos, vermelhos, marrons
-    # if coletavel.pos_x -20 <  player.pos_x and player.pos_x < coletavel.pos_x + 10:
-    #   if coletavel.pos_y - 20 < player.pos_y and player. pos_y < coletavel.pos_y + 10:
-    #      coletavel.pos_x = randint(0,largura-10)
-    #     coletavel.pos_y = randint(51,altura-10)
-    #    if coletavel == vermelho:
-    #       vermelhos += 1
-    #  if coletavel == ciano:
-    #     cianos += 1
-    # if coletavel == marrom:
-    #   marrons += 1
+            x_controle = 0
+            y_controle = velocidade
+        if player.pos_x > largura:
+            player.pos_x = 0
+        if player.pos_x < 0:
+            player.pos_x = largura
+        if player.pos_y > altura:
+            player.pos_y = 0
+        if player.pos_y < 0:
+            player.pos_y = altura
 
+    def colidiu(self, coletavel):
+        global Coletaveis, cianos, vermelhos, marrons
+        if coletavel.pos_x -30 <  player.pos_x and player.pos_x < coletavel.pos_x + 10:
+            if coletavel.pos_y - 20 < player.pos_y and player. pos_y < coletavel.pos_y + 10:
+                coletavel.pos_x = randint(0,largura-10)
+                coletavel.pos_y = randint(51,altura-10)
+                if coletavel == vermelho:
+                    vermelhos += 1
+                if coletavel == ciano:
+                    cianos += 1
+                if coletavel == marrom:
+                    marrons += 1
+    def desenhar(self):
+        pygame.draw.rect(tela, (0,0,255), (self.pos_x, self.pos_y, 25, 25))
 
-sprites = pygame.sprite.Group()
-player = Mario()
-sprites.add(player)
+class Coletaveis:
+    def __init__(self, cor, pos_x, pos_y):
+        self.cor = cor
+        self.pos_x = pos_x
+        self.pos_y = pos_y
 
+    def desenhar_coletaveis(self):
+        pygame.draw.rect(tela, self.cor, (self.pos_x, self.pos_y, 15, 15))
 
-class Coletaveis(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.joia_azul = pygame.image.load(
-            'kisspng-heart-pixel-blue-heart-shaped-hairpin-5aa545398472a9.2559131815207806015425.png')
-        self.joia_verde = pygame.image.load('pngwing.com (1).png')
-        self.joia_vermelha = pygame.image.load(
-            'kisspng-pixel-art-8-bit-color-heart-t-shirt-gemstone-5ad694555bda02.6436026015240121173762.png')
-        self.azul = pygame.transform.scale(self.joia_azul, (15, 15))
-        self.verde = pygame.transform.scale(self.joia_verde, (15, 15))
-        self.vermelha = pygame.transform.scale(self.joia_vermelha, (15, 15))
-        self.lista_joias = []
-        
+class Vilao():
+    def __init__(self, cor, pos_x, pos_y):
+        self.cor = cor
+        self.pos_x = pos_x
+        self.pos_y = pos_y
 
-joia = Coletaveis()
-sprites.add(joia)
+    def desenhar_vilao(self):
+        pygame.draw.rect(tela, self.cor, (self.pos_x, self.pos_y, 20, 20))
+
 
 def reiniciar_jogo():
     global menu
@@ -101,13 +95,12 @@ def reiniciar_jogo():
 
 
 menu = True
-
 while menu:
     tela.fill((0, 0, 0))
 
     inicio = ('Pressione a barra de espaço para iniciar')
     texto_formatado3 = fonte.render(inicio, True, (255, 255, 255))
-    tela.blit(texto_formatado3, (150, altura / 2))
+    tela.blit(texto_formatado3, (100, altura / 2))
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -118,24 +111,24 @@ while menu:
 
     pygame.display.update()
 
-#vermelho = Coletaveis((255, 0, 0), (randint(0, largura - 30)), (randint(0, altura - 30)))
-#ciano = Coletaveis((0, 255, 255), (randint(0, largura - 30)), (randint(0, altura - 30)))
-#marrom = Coletaveis((150, 75, 0), (randint(0, largura - 30)), (randint(0, altura - 30)))
-#lista.append(ciano)
-#lista.append(vermelho)
-#lista.append(marrom)
-while True:
-    tela.blit(background, (0, 0))
+player = Player((0,0,255), largura//2, altura//2 )
+vermelho = Coletaveis((255, 0, 0), (randint(0, largura - 30)), (randint(50, altura - 30)))
+ciano = Coletaveis((0, 255, 255), (randint(0, largura - 30)), (randint(50, altura - 30)))
+marrom = Coletaveis((150, 75, 0), (randint(0, largura - 30)), (randint(50, altura - 30)))
+lista.append(ciano)
+lista.append(vermelho)
+lista.append(marrom)
+
+while vivo:
+    tela.fill((0,0,0))
     mensagem = (f'Cianos: {cianos} | Marrons:{marrons} | Vermelhos:{vermelhos}')
     texto_formatado = fonte_placar.render(mensagem, True, (255, 255, 255), True)
 
     relogio.tick(30)
-    tela.blit(redimensionado, (0, 0))
-
-    sprites.draw(tela)
-    vermelho.desenhar_coletavel()
-    ciano.desenhar_coletavel()
-    marrom.desenhar_coletavel()
+    player.desenhar()
+    vermelho.desenhar_coletaveis()
+    ciano.desenhar_coletaveis()
+    marrom.desenhar_coletaveis()
     pygame.draw.line(tela, (150, 75, 0), (0, 50), (largura, 50), 5)
 
     for event in pygame.event.get():
@@ -143,11 +136,13 @@ while True:
             exit()
         if event.type == KEYDOWN:
             player.andar()
-        # for coletavel in lista:
-        # player.colidiu(coletavel)
-    sprites.draw(tela)
-    sprites.update()
-
-    player.rect.topleft = ((x_controle, y_controle))
+    for coletavel in lista:
+        player.colidiu(coletavel)
+    player.pos_x += x_controle
+    player.pos_y += y_controle
+    if player.pos_x > largura:
+        player.pos_x = 0
+    if player.pos_y > altura:
+        player.pos_y = 0
     tela.blit(texto_formatado, (20, altura // 20))
     pygame.display.update()
