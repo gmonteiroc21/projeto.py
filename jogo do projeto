@@ -14,11 +14,14 @@ pygame.display.set_caption('Jogo')
 # variaveis iniciais
 cianos = vermelhos = marrons = 0
 vivo = True
+imortal = False
 velocidade = 10
-velocidade_vilao = 15
+velocidade_vilao = 8
 x_controle = 0
 y_controle = 0
-lista = []
+controlex_vilao = 0
+controley_vilao = 0
+lista_coletaveis = []
 
 relogio = pygame.time.Clock()
 fonte = pygame.font.SysFont('arial', 25, bold=True, italic=True)
@@ -56,28 +59,32 @@ class Player:
             player.pos_y = altura
 
     def colidiu(self, coletavel):
-        global Coletaveis, cianos, vermelhos, marrons
-        if coletavel.pos_x -30 <  player.pos_x and player.pos_x < coletavel.pos_x + 10:
-            if coletavel.pos_y - 20 < player.pos_y and player. pos_y < coletavel.pos_y + 10:
-                coletavel.pos_x = randint(0,largura-10)
-                coletavel.pos_y = randint(51,altura-10)
+        global Coletaveis, cianos, vermelhos, marrons, velocidade, imortal
+        if coletavel.centro_x -30 <  player.pos_x and player.pos_x < coletavel.centro_x + 10:
+            if coletavel.centro_y - 20 < player.pos_y and player. pos_y < coletavel.centro_y + 10:
+                coletavel.centro_x = randint(0,largura-10)
+                coletavel.centro_y = randint(51,altura-10)
                 if coletavel == vermelho:
                     vermelhos += 1
+                    velocidade += 3
                 if coletavel == ciano:
                     cianos += 1
+                    imortal = True
                 if coletavel == marrom:
                     marrons += 1
+                    velocidade -= 3
     def desenhar(self):
         pygame.draw.rect(tela, (0,0,255), (self.pos_x, self.pos_y, 25, 25))
 
 class Coletaveis:
-    def __init__(self, cor, pos_x, pos_y):
+    def __init__(self, cor, centro_x, centro_y, raio):
         self.cor = cor
-        self.pos_x = pos_x
-        self.pos_y = pos_y
+        self.centro_x = centro_x
+        self.centro_y = centro_y
+        self.raio = raio
 
     def desenhar_coletaveis(self):
-        pygame.draw.rect(tela, self.cor, (self.pos_x, self.pos_y, 15, 15))
+        pygame.draw.circle(tela, self.cor, (self.centro_x, self.centro_y), self.raio)
 
 class Vilao():
     def __init__(self, cor, pos_x, pos_y):
@@ -88,7 +95,22 @@ class Vilao():
     def desenhar_vilao(self):
         pygame.draw.rect(tela, self.cor, (self.pos_x, self.pos_y, 20, 20))
 
+    def perseguir(self):
+        global player, controlex_vilao, controley_vilao, vivo
+        if self.pos_x < player.pos_x:
+            controlex_vilao = velocidade_vilao
 
+        if self.pos_x > player.pos_x:
+            controlex_vilao = -velocidade_vilao
+
+        if self.pos_y < player.pos_y:
+
+            controley_vilao = velocidade_vilao
+        else:
+            controley_vilao = -velocidade_vilao
+        if player.pos_x - 20 < self.pos_x < player.pos_x + 20:
+            if player.pos_y - 20 < self.pos_y < player.pos_y + 20:
+                vivo = False
 def reiniciar_jogo():
     global menu
     menu = True
@@ -112,12 +134,13 @@ while menu:
     pygame.display.update()
 
 player = Player((0,0,255), largura//2, altura//2 )
-vermelho = Coletaveis((255, 0, 0), (randint(0, largura - 30)//10*10), (randint(50, altura - 30)//10*10))
-ciano = Coletaveis((0, 255, 255), (randint(0, largura - 30)//10*10), (randint(50, altura - 30)//10*10))
-marrom = Coletaveis((150, 75, 0), (randint(0, largura - 30)//10*10), (randint(50, altura - 30)//10*10))
-lista.append(ciano)
-lista.append(vermelho)
-lista.append(marrom)
+inimigo = Vilao((255, 255, 0), largura-20, altura-20 )
+vermelho = Coletaveis((255, 0, 0), randint(0, largura - 30), randint(0,altura - 30), 5)
+ciano = Coletaveis((0, 255, 255), randint(0, largura - 30), randint(0,altura - 30), 5)
+marrom = Coletaveis((150, 75, 0), randint(0, largura - 30), randint(0,altura - 30), 5)
+lista_coletaveis.append(ciano)
+lista_coletaveis.append(vermelho)
+lista_coletaveis.append(marrom)
 
 while vivo:
     tela.fill((0,0,0))
@@ -129,24 +152,29 @@ while vivo:
     vermelho.desenhar_coletaveis()
     ciano.desenhar_coletaveis()
     marrom.desenhar_coletaveis()
-    pygame.draw.line(tela, (150, 75, 0), (0, 50), (largura, 50), 5)
+    inimigo.desenhar_vilao()
 
     for event in pygame.event.get():
         if event.type == QUIT:
             exit()
         if event.type == KEYDOWN:
             player.andar()
-    for coletavel in lista:
+    for coletavel in lista_coletaveis:
         player.colidiu(coletavel)
+
     player.pos_x += x_controle
     player.pos_y += y_controle
+    inimigo.pos_x += controlex_vilao
+    inimigo.pos_y += controley_vilao
+
     if player.pos_x > largura:
         player.pos_x = 0
     if player.pos_y > altura:
         player.pos_y = 0
     if player.pos_x < 0:
         player.pos_x = 600
-    if player.pos_y < 50:
+    if player.pos_y < 0:
         player.pos_y = 600
+    inimigo.perseguir()
     tela.blit(texto_formatado, (20, altura // 20))
     pygame.display.update()
