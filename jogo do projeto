@@ -56,11 +56,11 @@ class Player:
         if event.key == K_DOWN:
             x_controle = 0
             y_controle = velocidade
-        if player.pos_x > largura:
+        if player.pos_x > largura-20:
             player.pos_x = 0
         if player.pos_x < 0:
             player.pos_x = largura
-        if player.pos_y > altura:
+        if player.pos_y > altura-20:
             player.pos_y = 0
         if player.pos_y < 0:
             player.pos_y = altura
@@ -226,12 +226,12 @@ while True:
         tela.blit(fonte_placar.render(f'Cianos: ' + str(cianos) + ' |', True, 'aqua'), (20, 30))
         tela.blit(fonte_placar.render(f'Verdes: ' + str(verdes) + ' |', True, 'green'), (100, 30))
         tela.blit(fonte_placar.render(f'Vermelhos: ' + str(vermelhos) + ' |', True, 'red'), (180, 30))
-        #tela.blit(texto_formatado, (20, altura // 20))
+        tela.blit(fonte_placar.render(f'Colete {10 - verdes} objetos verdes', True, 'green'), (400, 30))
         pygame.display.update()
         if verdes == 10:
             vivo = False
             campeao = True
-            gameover = ('Parabéns!!! Você conseguiu capturar 10 verdinhos!')
+            gameover = ('Você ganhou!!!')
             cor_gameover = (0,0,255)
     if not vivo:
         tela.fill((0, 0, 0))
