@@ -122,7 +122,7 @@ class Vilao():
 
         if self.pos_y < player.pos_y:
             controley_vilao = velocidade_vilao
-        else:
+        if self.pos_y > player.pos_y:
             controley_vilao = -velocidade_vilao
 
         if player.pos_x - 20 < self.pos_x < player.pos_x + 25 and not imortal :
