@@ -3,6 +3,7 @@ from pygame.locals import *
 from sys import exit
 from random import randint
 
+
 pygame.init()
 
 # criando tela
@@ -15,8 +16,8 @@ pygame.display.set_caption('Jogo')
 cianos = vermelhos = marrons = 0
 vivo = True
 imortal = False
-velocidade = 10
-velocidade_vilao = 8
+velocidade = 8
+velocidade_vilao = 4
 x_controle = 0
 y_controle = 0
 controlex_vilao = 0
@@ -67,12 +68,17 @@ class Player:
                 if coletavel == vermelho:
                     vermelhos += 1
                     velocidade += 3
+                    if imortal == True:
+                        imortal = False
                 if coletavel == ciano:
                     cianos += 1
                     imortal = True
+                    self.cor = (255,255,255)
                 if coletavel == marrom:
                     marrons += 1
                     velocidade -= 3
+                    if imortal == True:
+                        imortal = False
     def desenhar(self):
         pygame.draw.rect(tela, (0,0,255), (self.pos_x, self.pos_y, 25, 25))
 
@@ -108,13 +114,12 @@ class Vilao():
             controley_vilao = velocidade_vilao
         else:
             controley_vilao = -velocidade_vilao
-        if player.pos_x - 20 < self.pos_x < player.pos_x + 20:
+        if player.pos_x - 20 < self.pos_x < player.pos_x + 20 and not imortal :
             if player.pos_y - 20 < self.pos_y < player.pos_y + 20:
                 vivo = False
 def reiniciar_jogo():
     global menu
     menu = True
-
 
 menu = True
 while menu:
@@ -137,7 +142,7 @@ player = Player((0,0,255), largura//2, altura//2 )
 inimigo = Vilao((255, 255, 0), largura-20, altura-20 )
 vermelho = Coletaveis((255, 0, 0), randint(0, largura - 30), randint(0,altura - 30), 5)
 ciano = Coletaveis((0, 255, 255), randint(0, largura - 30), randint(0,altura - 30), 5)
-marrom = Coletaveis((150, 75, 0), randint(0, largura - 30), randint(0,altura - 30), 5)
+marrom = Coletaveis((0, 255, 0), randint(0, largura - 30), randint(0,altura - 30), 5)
 lista_coletaveis.append(ciano)
 lista_coletaveis.append(vermelho)
 lista_coletaveis.append(marrom)
@@ -146,7 +151,6 @@ while vivo:
     tela.fill((0,0,0))
     mensagem = (f'Cianos: {cianos} | Marrons:{marrons} | Vermelhos:{vermelhos}')
     texto_formatado = fonte_placar.render(mensagem, True, (255, 255, 255), True)
-
     relogio.tick(30)
     player.desenhar()
     vermelho.desenhar_coletaveis()
@@ -177,4 +181,6 @@ while vivo:
         player.pos_y = 600
     inimigo.perseguir()
     tela.blit(texto_formatado, (20, altura // 20))
+    if vivo == False:
+        reiniciar_jogo()
     pygame.display.update()
