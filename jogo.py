@@ -10,7 +10,7 @@ pygame.init()
 largura = 600
 altura = 600
 tela = pygame.display.set_mode((largura, altura))
-pygame.display.set_caption('Jogo')
+pygame.display.set_caption('QUADRADIN')
 
 # variaveis iniciais
 cianos = vermelhos = verdes = 0
