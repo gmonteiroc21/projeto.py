@@ -16,6 +16,7 @@ pygame.display.set_caption('Jogo')
 cianos = vermelhos = verdes = 0
 vivo = True
 imortal = False
+campeao = False
 velocidade = 8
 velocidade_vilao = 4
 x_controle = 0
@@ -24,11 +25,14 @@ controlex_vilao = 0
 controley_vilao = 0
 lista_coletaveis = []
 cor_tela = (0,0,0)
+cor_gameover = (255,0,0)
+
 relogio = pygame.time.Clock()
 fonte = pygame.font.SysFont('arial', 25, bold=True, italic=True)
 fonte2 = pygame.font.SysFont('arial', 18, bold=True, italic=False)
 fonte_placar = pygame.font.SysFont('arial', 15, True, False)
 fonte_vantagens = pygame.font.SysFont('arial', 22, bold=True, italic=False)
+fonte_gameover = pygame.font.SysFont('franklingothicmedium', 50, bold=True, italic=False)
 
 
 
@@ -52,11 +56,11 @@ class Player:
         if event.key == K_DOWN:
             x_controle = 0
             y_controle = velocidade
-        if player.pos_x > largura:
+        if player.pos_x > largura-20:
             player.pos_x = 0
         if player.pos_x < 0:
             player.pos_x = largura
-        if player.pos_y > altura:
+        if player.pos_y > altura-20:
             player.pos_y = 0
         if player.pos_y < 0:
             player.pos_y = altura
@@ -64,7 +68,7 @@ class Player:
     def colidiu(self, coletavel):
         global Coletaveis, cianos, vermelhos, verdes, velocidade, imortal, cor_tela, vivo
         if coletavel.centro_x -30 <   player.pos_x < coletavel.centro_x + 10:
-            if coletavel.centro_y - 20 <  player. pos_y < coletavel.centro_y + 10:
+            if coletavel.centro_y - 30 <  player. pos_y < coletavel.centro_y + 10:
                 coletavel.centro_x = randint(0,largura-10)
                 coletavel.centro_y = randint(51,altura-10)
                 if coletavel == vermelho:
@@ -118,7 +122,7 @@ class Vilao():
 
         if self.pos_y < player.pos_y:
             controley_vilao = velocidade_vilao
-        else:
+        if self.pos_y > player.pos_y:
             controley_vilao = -velocidade_vilao
 
         if player.pos_x - 20 < self.pos_x < player.pos_x + 25 and not imortal :
@@ -219,13 +223,31 @@ while True:
         if player.pos_y < 0:
             player.pos_y = 600
         inimigo.perseguir()
-        tela.blit(texto_formatado, (20, altura // 20))
+        tela.blit(fonte_placar.render(f'Cianos: ' + str(cianos) + ' |', True, 'aqua'), (20, 30))
+        tela.blit(fonte_placar.render(f'Verdes: ' + str(verdes) + ' |', True, 'green'), (100, 30))
+        tela.blit(fonte_placar.render(f'Vermelhos: ' + str(vermelhos) + ' |', True, 'red'), (180, 30))
+        tela.blit(fonte_placar.render(f'Colete {10 - verdes} objetos verdes', True, 'green'), (400, 30))
         pygame.display.update()
+        if verdes == 10:
+            vivo = False
+            campeao = True
+            gameover = ('Você ganhou!!!')
+            cor_gameover = (0,0,255)
     if not vivo:
         tela.fill((0, 0, 0))
-        gameover = ('Game Over :( Pressione "BARRA DE ESPAÇO" para reiniciar ou "esc" para sair.')
-        texto_formatado = fonte_placar.render(gameover, True, (255, 255, 255), True)
-        tela.blit(texto_formatado, (80, altura//2))
+        if not campeao:
+            gameover = ('Game Over :(')
+        reset = ('Pressione "BARRA DE ESPAÇO" para reiniciar')
+        sair = ('Pressione "ESC" para sair')
+        texto_formatado1 = fonte_gameover.render(gameover, True, cor_gameover, True)
+        texto_formatado2 = fonte.render(reset, True, (255, 255, 255), True)
+        texto_formatado3 = fonte2.render(sair, True, (0, 255, 0), True)
+
+
+        tela.blit(texto_formatado1, (130, altura // 6))
+        tela.blit(texto_formatado2, (20, altura // 2))
+        tela.blit(texto_formatado3, (170, altura // 1.6))
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 exit()
